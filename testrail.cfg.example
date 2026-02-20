@@ -1,0 +1,11 @@
+[API]
+url = https://yourdomain.testrail.io/
+email = your_email@example.com
+password = your_api_key
+
+[TESTRUN]
+project_id = 1
+# Provide either run_id or suite_id but not both
+# If run_id is omitted, tests will run but results won't push automatically
+# run_id = 13
+# suite_id = 456

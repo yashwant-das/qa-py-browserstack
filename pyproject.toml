@@ -1,0 +1,16 @@
+[project]
+name = "pytest-browserstack-mobile"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "appium-python-client>=5.2.6",
+    "browserstack-sdk>=1.37.0",
+    "jira>=3.10.5",
+    "pytest>=9.0.2",
+    "pytest-html>=4.2.0",
+    "pytest-testrail>=3.1.1",
+    "python-dotenv>=1.2.1",
+    "ruff>=0.15.2",
+]
