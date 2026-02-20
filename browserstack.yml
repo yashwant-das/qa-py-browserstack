@@ -1,0 +1,17 @@
+userName: ${BROWSERSTACK_USERNAME}
+accessKey: ${BROWSERSTACK_ACCESS_KEY}
+platforms:
+  - os: Windows
+    osVersion: 11
+    browserName: Chrome
+    browserVersion: latest
+  - os: OS X
+    osVersion: Ventura
+    browserName: Safari
+    browserVersion: latest
+browserstackLocal: true
+buildName: pytest-playwright-build
+projectName: pytest-browserstack-web
+debug: true
+networkLogs: true
+consoleLogs: errors
