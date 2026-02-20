@@ -13,8 +13,11 @@ def pytest_runtest_makereport(item, call):
     outcome = yield
     report = outcome.get_result()
 
+    # Check if the --jira flag was passed
+    jira_enabled = item.config.getoption("--jira")
+
     # We only look at actual test calls, not setup/teardown
-    if report.when == "call" and report.failed:
+    if report.when == "call" and report.failed and jira_enabled:
         # Extract the node ID (test name)
         test_name = item.nodeid
 
@@ -36,6 +39,16 @@ def pytest_runtest_makereport(item, call):
         )
         if issue_key:
             print(f"[JIRA HOOK] Successfully processed Jira Ticket: {issue_key}")
+
+
+def pytest_addoption(parser):
+    """Add custom command line arguments"""
+    parser.addoption(
+        "--jira",
+        action="store_true",
+        default=False,
+        help="Create/Update Jira defects automatically on test failures",
+    )
 
 
 @pytest.fixture(scope="session")

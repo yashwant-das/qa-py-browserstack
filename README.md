@@ -18,9 +18,11 @@ This is a Proof-of-Concept (POC) cross-browser test automation framework built w
 │   └── login_page.py    # Example POM logic
 ├── pyproject.toml       # Dependencies configuration
 ├── tests/
-│   ├── conftest.py      # Pytest global fixtures
-│   ├── test_api.py      # Examples of REST API testing
-│   └── test_web.py      # Examples of Web UI testing
+│   ├── api/
+│   │   └── test_api.py          # Examples of REST API testing
+│   ├── web/
+│   │   └── test_login_page.py   # Web specs matching page objects
+│   └── conftest.py              # Pytest global fixtures
 └── utils/
     └── api_client.py    # API Utility requests
 ```
@@ -40,14 +42,20 @@ This is a Proof-of-Concept (POC) cross-browser test automation framework built w
     uv run playwright install chromium
     ```
 
-3.  **Run All Tests Locally:**
+3.  **Run Local Web Tests:**
 
     ```bash
-    uv run pytest tests/
+    uv run pytest tests/web/
     ```
 
-    *   To see the browser UI while running, pass the `--headed` flag: `uv run pytest tests/test_web.py --headed`
-    *   To generate an HTML report in the standard Playwright directory, pass the `--html` flag: `uv run pytest tests/ --html=test-results/report.html --self-contained-html`
+4.  **Run Local API Tests:**
+
+    ```bash
+    uv run pytest tests/api/
+    ```
+
+    *   To see the browser UI while running, pass the `--headed` flag: `uv run pytest tests/web/test_login_page.py --headed`
+    *   To generate an HTML report in the standard Playwright directory, pass the `--html` flag: `uv run pytest tests/web/ --html=test-results/report.html`
 
 ## Run Tests on BrowserStack
 
@@ -63,7 +71,8 @@ This framework integrates with the BrowserStack SDK for cloud execution. It targ
 
 2.  **Run the Tests using the SDK:**
 
-    uv run browserstack-sdk pytest tests/
+    ```bash
+    uv run browserstack-sdk pytest tests/web/
     ```
 
 You can view the test results directly in the BrowserStack Automate dashboard.
@@ -91,9 +100,9 @@ This repository is integrated with TestRail via the `pytest-testrail` plugin.
    ```
 3. **Execute & Push:** When you run tests with the testrail flag, the results automatically update in TestRail:
    ```bash
-   uv run pytest tests/ --testrail
+   uv run pytest tests/web/ --testrail
    # Or via BrowserStack
-   uv run browserstack-sdk pytest tests/ --testrail
+   uv run browserstack-sdk pytest tests/web/ --testrail
    ```
 
 ## Jira Integration
@@ -106,6 +115,13 @@ This repository automatically generates Jira Bug tickets whenever an automated t
    JIRA_EMAIL=your_email@example.com
    JIRA_API_TOKEN=your_jira_api_token
    JIRA_PROJECT_KEY=SCRUM
+   JIRA_BOARD_ID=1
    ```
-2. **Execution:** There are no flags to pass. The Pytest `makereport` hook inside `tests/conftest.py` is always listening. If a test fails, it captures the `AssertionError` traceback and pushes it to Jira.
+2. **Execution:** Pass the `--jira` flag when running tests:
+   ```bash
+   uv run pytest tests/web/ --jira
+   # Or combine both
+   uv run pytest tests/web/ --testrail --jira
+   ```
+   The Pytest `makereport` hook inside `tests/conftest.py` will intercept the run. If a test fails, it captures the `AssertionError` traceback and pushes it to Jira.
 3. **Deduplication:** To avoid spamming your Jira board, the `JiraClient` searches for existing open bugs matching the failed Test Name. If an open bug already exists, it simply adds a comment with the latest failure traceback instead of creating a duplicate ticket!
