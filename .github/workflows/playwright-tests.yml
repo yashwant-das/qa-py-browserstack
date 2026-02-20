@@ -11,10 +11,17 @@ jobs:
   run-tests:
     name: Pytest Playwright on BrowserStack
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     
     env:
       BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
       BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+      # Jira variables will be automatically picked up by python-dotenv/os.getenv
+      JIRA_URL: ${{ secrets.JIRA_URL }}
+      JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+      JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+      JIRA_PROJECT_KEY: ${{ vars.JIRA_PROJECT_KEY || 'SCRUM' }}
+      JIRA_BOARD_ID: ${{ vars.JIRA_BOARD_ID || '1' }}
 
     steps:
       - name: Checkout Repository
@@ -33,5 +40,18 @@ jobs:
       - name: Install Dependencies
         run: uv sync
 
+      - name: Generate TestRail Config
+        run: |
+          cat <<EOF > testrail.cfg
+          [API]
+          url = ${{ secrets.TESTRAIL_URL }}
+          email = ${{ secrets.TESTRAIL_EMAIL }}
+          password = ${{ secrets.TESTRAIL_API_KEY }}
+
+          [TESTRUN]
+          project_id = 2
+          EOF
+
       - name: Run Web Tests on BrowserStack
-        run: uv run browserstack-sdk pytest tests/web/
+        # Automatically pushes TestRail data and files Jira Bugs
+        run: uv run browserstack-sdk pytest tests/web/ --testrail --jira
