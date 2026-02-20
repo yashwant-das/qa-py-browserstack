@@ -1,8 +1,10 @@
 import re
 
 from playwright.sync_api import Page, expect
+from pytest_testrail.plugin import pytestrail
 
 
+@pytestrail.case("46")
 def test_has_title(page: Page):
     page.goto("https://playwright.dev/")
 

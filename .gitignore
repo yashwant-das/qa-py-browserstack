@@ -29,6 +29,12 @@ ENV/
 # Pytest
 .pytest_cache/
 
+# TestRail Config containing secrets
+testrail.cfg
+
+# Secrets
+.env
+
 # Playwright & Testing
 test-results/
 playwright-report/

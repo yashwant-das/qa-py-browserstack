@@ -63,8 +63,49 @@ This framework integrates with the BrowserStack SDK for cloud execution. It targ
 
 2.  **Run the Tests using the SDK:**
 
-    ```bash
     uv run browserstack-sdk pytest tests/
     ```
 
 You can view the test results directly in the BrowserStack Automate dashboard.
+
+## TestRail Integration
+
+This repository is integrated with TestRail via the `pytest-testrail` plugin.
+
+1. **Configure Credentials:** Copy the template `testrail.cfg` (already git-ignored) and fill in your details:
+   ```ini
+   [API]
+   url = https://yourdomain.testrail.io/
+   email = your_email@example.com
+   password = your_api_key
+   
+   [TESTRUN]
+   project_id = 1
+   ```
+2. **Tag Tests:** Decorate your Pytest definitions with their TestRail ID:
+   ```python
+   from pytest_testrail.plugin import pytestrail
+   
+   @pytestrail.case('C1234')
+   def test_successful_login(page):
+   ```
+3. **Execute & Push:** When you run tests with the testrail flag, the results automatically update in TestRail:
+   ```bash
+   uv run pytest tests/ --testrail
+   # Or via BrowserStack
+   uv run browserstack-sdk pytest tests/ --testrail
+   ```
+
+## Jira Integration
+
+This repository automatically generates Jira Bug tickets whenever an automated test fails.
+
+1. **Configure Credentials:** The architecture listens for your Jira credentials in a secure `.env` file at the root. Copy this template (the `.env` file is git-ignored) and populate it:
+   ```env
+   JIRA_URL=https://yourcompany.atlassian.net
+   JIRA_EMAIL=your_email@example.com
+   JIRA_API_TOKEN=your_jira_api_token
+   JIRA_PROJECT_KEY=SCRUM
+   ```
+2. **Execution:** There are no flags to pass. The Pytest `makereport` hook inside `tests/conftest.py` is always listening. If a test fails, it captures the `AssertionError` traceback and pushes it to Jira.
+3. **Deduplication:** To avoid spamming your Jira board, the `JiraClient` searches for existing open bugs matching the failed Test Name. If an open bug already exists, it simply adds a comment with the latest failure traceback instead of creating a duplicate ticket!
