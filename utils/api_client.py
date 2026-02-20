@@ -1,5 +1,6 @@
 import requests
 
+
 class APIClient:
     def __init__(self, base_url="https://jsonplaceholder.typicode.com"):
         self.base_url = base_url
@@ -13,11 +14,15 @@ class APIClient:
         return response
 
     def create_user(self, name, job):
-        response = requests.post(f"{self.base_url}/users", json={"name": name, "job": job})
+        response = requests.post(
+            f"{self.base_url}/users", json={"name": name, "job": job}
+        )
         return response
 
     def update_user(self, user_id, name, job):
-        response = requests.put(f"{self.base_url}/users/{user_id}", json={"name": name, "job": job})
+        response = requests.put(
+            f"{self.base_url}/users/{user_id}", json={"name": name, "job": job}
+        )
         return response
 
     def delete_user(self, user_id):

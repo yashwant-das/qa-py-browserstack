@@ -3,12 +3,16 @@ accessKey: ${BROWSERSTACK_ACCESS_KEY}
 platforms:
   - os: Windows
     osVersion: 11
-    browserName: Chrome
+    browserName: chrome
     browserVersion: latest
+    playwrightConfigOptions:
+      name: windows
   - os: OS X
     osVersion: Ventura
-    browserName: Safari
+    browserName: playwright-webkit
     browserVersion: latest
+    playwrightConfigOptions:
+      name: osX
 browserstackLocal: true
 buildName: pytest-playwright-build
 projectName: pytest-browserstack-web

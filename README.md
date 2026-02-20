@@ -43,11 +43,11 @@ This is a Proof-of-Concept (POC) cross-browser test automation framework built w
 3.  **Run All Tests Locally:**
 
     ```bash
-    export PYTHONPATH=$PYTHONPATH:$(pwd)
     uv run pytest tests/
     ```
 
-    *   To see the browser UI while running, pass the `--headed` flag: `export PYTHONPATH=$PYTHONPATH:$(pwd) && uv run pytest tests/test_web.py --headed`
+    *   To see the browser UI while running, pass the `--headed` flag: `uv run pytest tests/test_web.py --headed`
+    *   To generate an HTML report in the standard Playwright directory, pass the `--html` flag: `uv run pytest tests/ --html=test-results/report.html --self-contained-html`
 
 ## Run Tests on BrowserStack
 
@@ -64,7 +64,6 @@ This framework integrates with the BrowserStack SDK for cloud execution. It targ
 2.  **Run the Tests using the SDK:**
 
     ```bash
-    export PYTHONPATH=$PYTHONPATH:$(pwd)
     uv run browserstack-sdk pytest tests/
     ```
 
