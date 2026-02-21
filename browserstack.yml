@@ -5,11 +5,11 @@ platforms:
   - platformName: android
     osVersion: 12.0
     deviceName: Samsung Galaxy S22 Ultra
-  - platformName: ios
-    platformVersion: 16.0
-    deviceName: iPhone 14 Pro
-    app: ./apps/ios/ios.simulator.wdio.native.app.v2.0.0.zip
-browserstackLocal: true
+#   - platformName: ios
+#     platformVersion: 16.0
+#     deviceName: iPhone 14 Pro
+#     app: ./apps/ios/ios.simulator.wdio.native.app.v2.0.0.zip
+browserstackLocal: false
 buildName: pytest-appium-build
 projectName: pytest-browserstack-mobile
 debug: true

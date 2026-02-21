@@ -96,7 +96,8 @@ def driver(request):
     is_browserstack = (
         "browserstack-sdk" in sys.argv[0]
         or request.config.pluginmanager.hasplugin("browserstack_sdk")
-        or os.getenv("BROWSERSTACK_USERNAME") is not None
+        or os.getenv("BROWSERSTACK_SDK") == "true"
+        or os.getenv("BROWSERSTACK_AUTOMATION") == "true"
     )
 
     platform = request.config.getoption("--platform").lower()
@@ -124,10 +125,6 @@ def driver(request):
             options.app = os.path.abspath(app_path)
         if device_name:
             options.device_name = device_name
-
-        print(
-            f"\n[LOCAL EXECUTION] Launching on {platform} with {options.to_capabilities()}"
-        )
 
     # The BS SDK will inject its own URL and Caps over these if running via `browserstack-sdk pytest`
     driver = webdriver.Remote(appium_server_url, options=options)

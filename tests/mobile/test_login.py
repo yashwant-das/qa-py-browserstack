@@ -1,8 +1,10 @@
-from pages.login_page import LoginPage
 from pytest_testrail.plugin import pytestrail
 
+from pages.login_page import LoginPage
+
+
 class TestDemoApp:
-    @pytestrail.case("C12345")
+    @pytestrail.case("47")
     def test_login_success(self, driver):
         """
         Test that login with valid credentials yields success message.
@@ -19,4 +21,6 @@ class TestDemoApp:
         # 3. Verify success message
         success_msg = page.get_success_message()
 
-        assert "You are logged in!" in success_msg, f"Expected success message not found. Got: {success_msg}"
+        assert "You are logged in!" in success_msg, (
+            f"Expected success message not found. Got: {success_msg}"
+        )

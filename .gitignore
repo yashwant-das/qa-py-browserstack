@@ -13,7 +13,6 @@ test-results/
 .coverage
 htmlcov/
 pytestdebug.log
-
 # C extensions
 *.so
 
@@ -71,3 +70,7 @@ apps/**/*.zip
 
 # MacOS 
 Thumbs.db
+
+#Log
+log/
+
