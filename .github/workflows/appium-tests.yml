@@ -56,4 +56,4 @@ jobs:
 
       - name: Run Mobile Tests on BrowserStack
         # Automatically pushes TestRail data and files Jira Bugs
-        run: uv run browserstack-sdk pytest tests/mobile/test_login.py --platform android
+        run: uv run browserstack-sdk pytest tests/mobile/test_login.py --platform android --testrail
