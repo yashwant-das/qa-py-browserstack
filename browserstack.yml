@@ -2,13 +2,13 @@ userName: ${BROWSERSTACK_USERNAME}
 accessKey: ${BROWSERSTACK_ACCESS_KEY}
 platforms:
   - platformName: android
-    platformVersion: 13.0
-    deviceName: Samsung Galaxy S23
-    app: bs://sample.app
+    platformVersion: 16.0
+    deviceName: Medium Phone API 36.1
+    app: bs://<android_demo_app_url>
   - platformName: ios
-    platformVersion: 16
-    deviceName: iPhone 14
-    app: bs://sample.app
+    platformVersion: 26.2
+    deviceName: iPhone 17 Pro Max
+    app: bs://<ios_demo_app_url>
 browserstackLocal: true
 buildName: pytest-appium-build
 projectName: pytest-browserstack-mobile

@@ -41,12 +41,33 @@ This is a Proof-of-Concept (POC) mobile App automation framework built with Pyth
 2.  **Appium Server:**
     Ensure you have an Appium Server running locally (`http://127.0.0.1:4723`) and a local emulator/simulator setup if you wish to run completely bare-metal.
 
-3.  **Run Local Mobile Tests:**
+3.  **Local Execution Configuration:**
+    The project uses a `pytest.ini` file to explicitly disable the BrowserStack SDK plugin during local runs (`addopts = -p no:browserstack_sdk`). 
     
-    The Appium driver dynamically generates capabilities based on custom Pytest CLI arguments.
+    This is required because the `browserstack_sdk` auto-injects itself and intercepts Appium driver initialization. Disabling it ensures standard `appium:app` capabilities load seamlessly onto your local emulators without cloud interference.
 
+4.  **Run Local Mobile Tests:**
+    
+    The Appium driver dynamically generates capabilities based on custom Pytest CLI arguments. Here are several ways to execute the tests:
+
+    **Run on Android (Default):**
     ```bash
-    uv run pytest tests/mobile/ --platform=android --app-path=apps/sample.apk --device-name="emulator-5554"
+    uv run pytest tests/mobile/test_login.py --platform android
+    ```
+
+    **Run on iOS:**
+    ```bash
+    uv run pytest tests/mobile/test_login.py --platform ios
+    ```
+
+    **Run on a specific emulator with a custom APK path:**
+    ```bash
+    uv run pytest tests/mobile/test_login.py --platform android --app-path apps/custom.apk --device-name "emulator-5554"
+    ```
+
+    **Run with Jira defect creation enabled:**
+    ```bash
+    uv run pytest tests/mobile/test_login.py --platform ios --jira
     ```
     
     **Available CLI Flags:**
@@ -57,6 +78,8 @@ This is a Proof-of-Concept (POC) mobile App automation framework built with Pyth
 ## Run Tests on BrowserStack
 
 This framework interacts directly with the BrowserStack SDK for unified cloud execution across disparate operating systems defined in `browserstack.yml`.
+
+> **Note:** Executing tests via the `browserstack-sdk` CLI wrapper automatically overrides the `pytest.ini` configuration, allowing the plugin to inject its cloud capabilities as intended.
 
 1.  **Set Environment Variables:**
     Export your BrowserStack credentials.

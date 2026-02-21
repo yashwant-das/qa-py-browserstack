@@ -1,9 +1,15 @@
 import os
+import sys
+
+# Add project root to Python path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import pytest
 from appium import webdriver
 from appium.options.android import UiAutomator2Options
 from appium.options.ios import XCUITestOptions
+
+from config.capabilities import get_local_caps
 from utils.jira_client import JiraClient
 
 # Global instance
@@ -84,9 +90,12 @@ def driver(request):
     appium_server_url = "http://127.0.0.1:4723"
 
     # Are we running on BrowserStack or Locally?
-    # BrowserStack SDK injects capabilities implicitly, so an empty Options object suffices.
-    # If running locally, we need to manually construct the capabilities using the CLI flags.
-    is_browserstack = bool(os.getenv("BROWSERSTACK_USERNAME"))
+    # We check an environment variable that would be specifically set
+    # by the BrowserStack SDK or CI pipeline, not just credentials from .env
+    is_browserstack = os.getenv("BROWSERSTACK_USERNAME") and (
+        "browserstack-sdk" in sys.argv[0]
+        or os.getenv("BROWSERSTACK_PROJECT") is not None
+    )
 
     platform = request.config.getoption("--platform").lower()
     app_path = request.config.getoption("--app-path")
@@ -94,16 +103,15 @@ def driver(request):
 
     if platform == "ios":
         options = XCUITestOptions()
-        if not is_browserstack:
-            options.platform_name = "iOS"
-            options.automation_name = "XCUITest"
     else:
         options = UiAutomator2Options()
-        if not is_browserstack:
-            options.platform_name = "Android"
-            options.automation_name = "UiAutomator2"
 
     if not is_browserstack:
+        # Load default local capabilities from config
+        local_caps = get_local_caps(platform)
+        options.load_capabilities(local_caps)
+
+        # Override with explicit CLI flags if provided
         if app_path:
             options.app = os.path.abspath(app_path)
         if device_name:

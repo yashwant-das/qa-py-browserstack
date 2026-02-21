@@ -1,40 +1,22 @@
 from pages.login_page import LoginPage
 from pytest_testrail.plugin import pytestrail
 
-
-class TestWikipediaSearch:
+class TestDemoApp:
     @pytestrail.case("C12345")
-    def test_search_wikipedia_successfully(self, driver):
+    def test_login_success(self, driver):
         """
-        Test that searching for a term yields results.
-        Runs dynamically on whatever platform BrowserStack routes to.
-        """
-        page = LoginPage(driver)
-
-        search_term = "BrowserStack"
-        page.perform_search(search_term)
-
-        results = page.get_search_results()
-
-        assert len(results) > 0, "No search results returned!"
-
-        # Verify that at least one result contains our search term (case-insensitive)
-        found_match = any(search_term.lower() in result.lower() for result in results)
-        assert found_match is True, (
-            f"Search term '{search_term}' not found in any result: {results}"
-        )
-
-    @pytestrail.case("C12346")
-    def test_search_results_failure_example(self, driver):
-        """
-        This test is intentionally designed to fail to demonstrate
-        the Jira and TestRail defect integration.
+        Test that login with valid credentials yields success message.
+        Runs dynamically on whatever platform BrowserStack routes to, or locally.
         """
         page = LoginPage(driver)
 
-        page.perform_search("NonsenseTermThatShouldNotReturnResults1234")
+        # 1. Navigate to Login Tab
+        page.go_to_login_tab()
 
-        results = page.get_search_results()
+        # 2. Enter credentials and login
+        page.login("test@gmail.com", "12345678")
 
-        # This assertion will fail because the list *should* be empty
-        assert len(results) > 50, "Intentional failure to trigger Jira Hook!"
+        # 3. Verify success message
+        success_msg = page.get_success_message()
+
+        assert "You are logged in!" in success_msg, f"Expected success message not found. Got: {success_msg}"

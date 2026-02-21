@@ -1,8 +1,8 @@
 from appium.webdriver.webdriver import WebDriver
 from appium.webdriver.webelement import WebElement
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 
 class BasePage:
@@ -18,7 +18,9 @@ class BasePage:
             wait = WebDriverWait(self.driver, timeout)
             return wait.until(EC.presence_of_element_located(locator))
         except TimeoutException:
-            raise TimeoutException(f"Element {locator} not found after {timeout} seconds.")
+            raise TimeoutException(
+                f"Element {locator} not found after {timeout} seconds."
+            )
 
     def click(self, locator: tuple[str, str], timeout: int = 10) -> None:
         """Wait for an element to be clickable and click it."""
@@ -27,9 +29,13 @@ class BasePage:
             element = wait.until(EC.element_to_be_clickable(locator))
             element.click()
         except TimeoutException:
-            raise TimeoutException(f"Element {locator} not clickable after {timeout} seconds.")
+            raise TimeoutException(
+                f"Element {locator} not clickable after {timeout} seconds."
+            )
 
-    def input_text(self, locator: tuple[str, str], text: str, timeout: int = 10) -> None:
+    def input_text(
+        self, locator: tuple[str, str], text: str, timeout: int = 10
+    ) -> None:
         """Wait for an element to be present, clear it, and input text."""
         element = self.find_element(locator, timeout)
         element.clear()

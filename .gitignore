@@ -55,9 +55,10 @@ browserstack-local.log
 # We ignore the actual app bundles because they are massive binaries
 # Ensure developers use CI pipelines or manual upload to pull tested binaries.
 # Or if needed, commit only small sample APKs
-apps/*.apk
-apps/*.ipa
-apps/*.app
+apps/**/*.apk
+apps/**/*.ipa
+apps/**/*.app
+apps/**/*.zip
 !apps/WikipediaSample.apk
 
 # IDEs and Editors
