@@ -16,6 +16,8 @@ jobs:
     env:
       BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
       BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+      BROWSERSTACK_SDK: true
+      BROWSERSTACK_AUTOMATION: true
       # Jira variables will be automatically picked up by python-dotenv/os.getenv
       # JIRA_URL: ${{ secrets.JIRA_URL }}
       # JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}

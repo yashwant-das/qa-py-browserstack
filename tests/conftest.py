@@ -98,6 +98,7 @@ def driver(request):
         or request.config.pluginmanager.hasplugin("browserstack_sdk")
         or os.getenv("BROWSERSTACK_SDK") == "true"
         or os.getenv("BROWSERSTACK_AUTOMATION") == "true"
+        or os.getenv("GITHUB_ACTIONS") == "true"
     )
 
     platform = request.config.getoption("--platform").lower()
