@@ -4,12 +4,12 @@
 
 This is a Proof-of-Concept (POC) mobile App automation framework built with Python, Pytest, Appium, and integrated natively with BrowserStack for unified cross-device cloud execution.
 
-## Features
+- **Unified Page Object Model (POM):** Supports handling iOS and Android locators dynamically within the same Page Object class.
+- **Pure Appium Setup:** Direct `appium-python-client` configuration abstracted inside modular Pytest fixtures.
+- **BrowserStack Integration:** Unified cloud scaling with the `browserstack-sdk` and automatic app binary orchestration.
+- **Local App Management:** Centralized `apps/` directory for `.ipa` and `.apk` storage with automatic local path resolution.
 
-- **Unified Page Object Model (POM):** Supports handling iOS and Android locators dynamically within the same Page Object class (`pages/base_page.py`, `pages/login_page.py`).
-- **Appium Setup:** Pure `appium-python-client` configuration abstracted inside Pytest fixtures.
-- **BrowserStack Integration:** Ready-to-use cloud mobile scaling with `browserstack-sdk`.
-- **Local App Builds:** Pre-configured `apps/` directory to store `.ipa` and `.apk` files.
+---
 
 ## Project Structure
 
@@ -70,35 +70,60 @@ This is a Proof-of-Concept (POC) mobile App automation framework built with Pyth
     uv run pytest tests/mobile/test_login.py --platform ios --jira
     ```
     
-    **Available CLI Flags:**
-    * `--platform`: Options are `android` or `ios` (Default: `android`)
-    * `--app-path`: Absolute or relative path to your compiled application binary. (Default: None)
-    * `--device-name`: The precise name of the emulator/simulator. (Default: None)
+### Available CLI Flags
+
+The `driver` fixture recognizes the following flags to customize execution:
+
+| Flag | Options | Description | Default |
+| :--- | :--- | :--- | :--- |
+| `--platform` | `android`, `ios` | Targets the specific mobile platform. | `android` |
+| `--app-path` | Path string | Explicit path to an application binary. | `None` |
+| `--device-name`| String | Precise name of the local emulator/simulator. | `None` |
+| `--jira` | Boolean | Enable automatic Jira defect creation. | `False` |
+| `--testrail` | Boolean | Enable TestRail result synchronization. | `False` |
 
 ## Run Tests on BrowserStack
 
-This framework interacts directly with the BrowserStack SDK for unified cloud execution across disparate operating systems defined in `browserstack.yml`.
+This framework is natively integrated with the BrowserStack SDK for unified cloud execution across real Android and iOS devices.
 
-> **Note:** Executing tests via the `browserstack-sdk` CLI wrapper automatically overrides the `pytest.ini` configuration, allowing the plugin to inject its cloud capabilities as intended.
+> [!TIP]
+> Executing tests via the `browserstack-sdk` CLI wrapper automatically overrides the local Appium configuration and handles automatic application uploads.
 
-1.  **Set Environment Variables:**
-    Export your BrowserStack credentials.
+### 1. Set Credentials
 
-    ```bash
-    export BROWSERSTACK_USERNAME="YOUR_USERNAME"
-    export BROWSERSTACK_ACCESS_KEY="YOUR_ACCESS_KEY"
-    ```
+Export your BrowserStack credentials as environment variables (recommended to add these to your `~/.zshrc` or `~/.bashrc`):
 
-2.  **Define the App Url:**
-    Upload your `.apk` or `.ipa` to Browserstack (via curl/API or BrowserStack UI) and update the `app: bs://<hash>` keys inside `browserstack.yml`.
+```bash
+export BROWSERSTACK_USERNAME="YOUR_USERNAME"
+export BROWSERSTACK_ACCESS_KEY="YOUR_ACCESS_KEY"
+```
 
-3.  **Run the Tests via the SDK:**
+### 2. Configure Apps & Devices
 
-    ```bash
-    uv run browserstack-sdk pytest tests/mobile/
-    ```
+The `browserstack.yml` file at the root manages your cloud configuration.
 
-You can view the mobile test recordings directly in the BrowserStack App Automate dashboard.
+- **Auto-Upload:** Point the `app` key to your local `.apk` or `.ipa` path. The SDK will automatically upload and cache the app before execution.
+- **Platforms:** Define the real devices and OS versions you want to target.
+
+### 3. Execution Commands
+
+The SDK wraps standard `pytest` commands. You can run tests individually, by directory, or combine them with reporting flags.
+
+| Scope | Command |
+| :--- | :--- |
+| **Full Suite** | `uv run browserstack-sdk pytest tests/mobile/` |
+| **Android Only** | `uv run browserstack-sdk pytest tests/mobile/ --platform android` |
+| **iOS Only** | `uv run browserstack-sdk pytest tests/mobile/ --platform ios` |
+| **Specific File** | `uv run browserstack-sdk pytest tests/mobile/test_login.py` |
+| **With Jira** | `uv run browserstack-sdk pytest tests/mobile/ --jira` |
+| **With TestRail** | `uv run browserstack-sdk pytest tests/mobile/ --testrail` |
+
+> [!NOTE]
+> Parallelism is managed via `parallelsPerPlatform` in `browserstack.yml`. The SDK handles session distribution automatically across your available BrowserStack parallel threads.
+
+### 4. Viewing Results
+
+After execution starts, the CLI will provide a direct link to the **BrowserStack App Automate** dashboard where you can view live video recordings, device vitals, and network logs.
 
 ## TestRail Integration
 

@@ -90,18 +90,26 @@ def driver(request):
     appium_server_url = "http://127.0.0.1:4723"
 
     # Are we running on BrowserStack or Locally?
-    # We check an environment variable that would be specifically set
-    # by the BrowserStack SDK or CI pipeline, not just credentials from .env
-    is_browserstack = os.getenv("BROWSERSTACK_USERNAME") and (
+    # When running via `browserstack-sdk pytest`, the SDK binary is the entry point (sys.argv[0]).
+    # The browserstack_sdk plugin is usually disabled in pytest.ini to avoid local conflicts,
+    # but the SDK CLI forces it in.
+    is_browserstack = (
         "browserstack-sdk" in sys.argv[0]
-        or os.getenv("BROWSERSTACK_PROJECT") is not None
+        or request.config.pluginmanager.hasplugin("browserstack_sdk")
+        or os.getenv("BROWSERSTACK_USERNAME") is not None
     )
 
     platform = request.config.getoption("--platform").lower()
     app_path = request.config.getoption("--app-path")
     device_name = request.config.getoption("--device-name")
 
-    if platform == "ios":
+    if is_browserstack:
+        # On BrowserStack, the SDK handles platform selection and capabilities via browserstack.yml
+        # We just need a generic options object to satisfy the driver initialization
+        from appium.options.common import AppiumOptions
+
+        options = AppiumOptions()
+    elif platform == "ios":
         options = XCUITestOptions()
     else:
         options = UiAutomator2Options()

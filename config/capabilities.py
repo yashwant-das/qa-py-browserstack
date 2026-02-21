@@ -14,6 +14,7 @@ LOCAL_CAPS = {
         "appium:autoGrantPermissions": True,
         "appium:enforceAppInstall": True,
         "appium:noReset": False,
+        "appium:newCommandTimeout": 300,
         "appium:app": os.path.join(
             PROJECT_ROOT, "apps", "android", "android.wdio.native.app.v2.0.0.apk"
         ),
@@ -27,6 +28,7 @@ LOCAL_CAPS = {
         # This is a known local Appium behavior when similar simulators exist on the host.
         "appium:deviceName": "iPhone 17 Pro",
         "appium:platformVersion": "26.2",
+        "appium:newCommandTimeout": 300,
         "appium:app": os.path.join(
             PROJECT_ROOT, "apps", "ios", "ios.simulator.wdio.native.app.v2.0.0.zip"
         ),

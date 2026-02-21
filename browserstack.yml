@@ -1,14 +1,14 @@
 userName: ${BROWSERSTACK_USERNAME}
 accessKey: ${BROWSERSTACK_ACCESS_KEY}
+app: ./apps/android/android.wdio.native.app.v2.0.0.apk
 platforms:
   - platformName: android
-    platformVersion: 16.0
-    deviceName: Medium Phone API 36.1
-    app: bs://<android_demo_app_url>
+    osVersion: 12.0
+    deviceName: Samsung Galaxy S22 Ultra
   - platformName: ios
-    platformVersion: 26.2
-    deviceName: iPhone 17 Pro Max
-    app: bs://<ios_demo_app_url>
+    platformVersion: 16.0
+    deviceName: iPhone 14 Pro
+    app: ./apps/ios/ios.simulator.wdio.native.app.v2.0.0.zip
 browserstackLocal: true
 buildName: pytest-appium-build
 projectName: pytest-browserstack-mobile
