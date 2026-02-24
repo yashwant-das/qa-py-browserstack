@@ -9,6 +9,8 @@ def test_successful_login(page):
     """Test valid login functionality on SauceDemo"""
     login_page = LoginPage(page)
     login_page.navigate_to_login()
+    # breakpoint()
+    # page.pause()
     login_page.login("standard_user", "secret_sauce")
 
     # Assert successful login by checking inventory is visible
