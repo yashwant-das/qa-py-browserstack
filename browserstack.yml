@@ -15,7 +15,7 @@ platforms:
       name: osX
 browserstackLocal: true
 buildName: pytest-playwright-build
-projectName: pytest-browserstack-web
+projectName: web-browserstack-framework
 debug: true
 networkLogs: true
 consoleLogs: errors

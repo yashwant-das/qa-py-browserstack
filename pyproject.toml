@@ -1,7 +1,7 @@
 [project]
-name = "pytest-browserstack-web"
+name = "web-browserstack-framework"
 version = "0.1.0"
-description = "Add your description here"
+description = "Cross-browser test automation framework using Pytest, Playwright, and BrowserStack, with TestRail and Jira integrations."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
