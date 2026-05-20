@@ -634,7 +634,7 @@ wheels = [
 ]
 
 [[package]]
-name = "pytest-browserstack-mobile"
+name = "mobile-browserstack-framework"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

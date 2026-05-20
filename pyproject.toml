@@ -1,7 +1,7 @@
 [project]
-name = "pytest-browserstack-mobile"
+name = "mobile-browserstack-framework"
 version = "0.1.0"
-description = "Add your description here"
+description = "Mobile app automation testing framework using Python, Pytest, and Appium with native BrowserStack cloud integration"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
