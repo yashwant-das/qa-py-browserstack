@@ -74,3 +74,6 @@ Thumbs.db
 #Log
 log/
 
+
+# BrowserStack SDK error output
+browserstack.err
