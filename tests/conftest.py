@@ -1,75 +1,65 @@
 import pytest
 
-from utils.api_client import APIClient
 from utils.jira_client import JiraClient
 
-# Global instance
-jira_client = JiraClient()
+_jira_client = None
 
 
-@pytest.hookimpl(tryfirst=True, hookwrapper=True)
-def pytest_runtest_makereport(item, call):
-    # Execute all other hooks to obtain the report object
-    outcome = yield
-    report = outcome.get_result()
-
-    # Check if the --jira flag was passed
-    jira_enabled = item.config.getoption("--jira")
-
-    # We only look at actual test calls, not setup/teardown
-    if report.when == "call" and report.failed and jira_enabled:
-        # Extract the node ID (test name)
-        test_name = item.nodeid
-
-        # Safely extract error traceback
-        error_message = "Test execution failed."
-        traceback_details = ""
-
-        if hasattr(report.longrepr, "reprcrash"):
-            error_message = report.longrepr.reprcrash.message
-
-        if report.longreprtext:
-            traceback_details = report.longreprtext
-
-        print(f"\n[JIRA HOOK] Detected failure for {test_name}. Notifying Jira...")
-        issue_key = jira_client.create_or_update_defect(
-            test_name=test_name,
-            error_message=error_message,
-            traceback=traceback_details,
-        )
-        if issue_key:
-            print(f"[JIRA HOOK] Successfully processed Jira Ticket: {issue_key}")
+def _jira():
+    global _jira_client
+    if _jira_client is None:
+        _jira_client = JiraClient()
+    return _jira_client
 
 
 def pytest_addoption(parser):
-    """Add custom command line arguments"""
+    """Options for every suite. pytest only reads pytest_addoption from the root conftest."""
     parser.addoption(
         "--jira",
         action="store_true",
         default=False,
         help="Create/Update Jira defects automatically on test failures",
     )
+    parser.addoption(
+        "--platform",
+        action="store",
+        default="android",
+        choices=["android", "ios"],
+        help="Mobile platform to run on locally (android or ios)",
+    )
+    parser.addoption(
+        "--app-path",
+        action="store",
+        default="",
+        help="Path to a local .apk or .ipa file for Appium",
+    )
+    parser.addoption(
+        "--device-name",
+        action="store",
+        default="",
+        help="Local device or emulator name (e.g. emulator-5554 or 'iPhone 15 Simulator')",
+    )
 
 
-@pytest.fixture(scope="session")
-def browserstack_url():
-    """Returns the BrowserStack endpoint with credentials"""
-    # BrowserStack integration works out of the box when you set
-    # BROWSERSTACK_USERNAME and BROWSERSTACK_ACCESS_KEY
-    # and run with `browserstack-sdk pytest`
-    # Default local playwright fixture will be used
-    return None
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    report = outcome.get_result()
 
+    if report.when != "call" or not report.failed or not item.config.getoption("--jira"):
+        return
 
-@pytest.fixture(scope="session")
-def api_client():
-    """Returns an API client instance"""
-    return APIClient()
+    test_name = item.nodeid
+    error_message = "Test execution failed."
+    if hasattr(report.longrepr, "reprcrash"):
+        error_message = report.longrepr.reprcrash.message
+    traceback_details = report.longreprtext or ""
 
-
-@pytest.fixture
-def page(context):
-    """Overrides the default page fixture to help ensure clean states"""
-    page = context.new_page()
-    yield page
-    page.close()
+    print(f"\n[JIRA HOOK] Detected failure for {test_name}. Notifying Jira...")
+    issue_key = _jira().create_or_update_defect(
+        test_name=test_name,
+        error_message=error_message,
+        traceback=traceback_details,
+    )
+    if issue_key:
+        print(f"[JIRA HOOK] Successfully processed Jira Ticket: {issue_key}")

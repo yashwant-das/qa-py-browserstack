@@ -1,7 +1,7 @@
 from appium.webdriver.common.appiumby import AppiumBy
 from appium.webdriver.webdriver import WebDriver
 
-from pages.base_page import BasePage
+from pages.mobile.base_page import BasePage
 
 
 class LoginPage(BasePage):

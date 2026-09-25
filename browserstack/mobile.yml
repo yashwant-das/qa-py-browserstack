@@ -1,18 +1,16 @@
 userName: ${BROWSERSTACK_USERNAME}
 accessKey: ${BROWSERSTACK_ACCESS_KEY}
-# app: ./apps/android/android.wdio.native.app.v2.0.0.apk
-app: bs://895e8fb87b79bdce91ec5181112502456dd8469c
+# The SDK uploads this file before the run. Download it from the WebdriverIO native demo app
+# release v2.0.0 (see README). Uploaded apps expire on BrowserStack after 30 days, so the
+# app is uploaded on every run instead of pinning a bs:// ID.
+app: ./apps/android/android.wdio.native.app.v2.0.0.apk
 platforms:
   - platformName: android
     osVersion: 12.0
     deviceName: Samsung Galaxy S22 Ultra
-#   - platformName: ios
-#     platformVersion: 16.0
-#     deviceName: iPhone 14 Pro
-#     app: ./apps/ios/ios.simulator.wdio.native.app.v2.0.0.zip
 browserstackLocal: false
 buildName: pytest-appium-build
-projectName: mobile-browserstack-framework
+projectName: qa-py-browserstack
 debug: true
 networkLogs: true
 consoleLogs: errors

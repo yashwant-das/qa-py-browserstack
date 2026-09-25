@@ -1,83 +1,12 @@
 import os
 import sys
 
-# Add project root to Python path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
 import pytest
 from appium import webdriver
 from appium.options.android import UiAutomator2Options
 from appium.options.ios import XCUITestOptions
 
-from config.capabilities import get_local_caps
-from utils.jira_client import JiraClient
-
-# Global instance
-jira_client = JiraClient()
-
-
-@pytest.hookimpl(tryfirst=True, hookwrapper=True)
-def pytest_runtest_makereport(item, call):
-    # Execute all other hooks to obtain the report object
-    outcome = yield
-    report = outcome.get_result()
-
-    # Check if the --jira flag was passed
-    jira_enabled = item.config.getoption("--jira")
-
-    # We only look at actual test calls, not setup/teardown
-    if report.when == "call" and report.failed and jira_enabled:
-        # Extract the node ID (test name)
-        test_name = item.nodeid
-
-        # Safely extract error traceback
-        error_message = "Test execution failed."
-        traceback_details = ""
-
-        if hasattr(report.longrepr, "reprcrash"):
-            error_message = report.longrepr.reprcrash.message
-
-        if report.longreprtext:
-            traceback_details = report.longreprtext
-
-        print(f"\n[JIRA HOOK] Detected failure for {test_name}. Notifying Jira...")
-        issue_key = jira_client.create_or_update_defect(
-            test_name=test_name,
-            error_message=error_message,
-            traceback=traceback_details,
-        )
-        if issue_key:
-            print(f"[JIRA HOOK] Successfully processed Jira Ticket: {issue_key}")
-
-
-def pytest_addoption(parser):
-    """Add custom command line arguments"""
-    parser.addoption(
-        "--jira",
-        action="store_true",
-        default=False,
-        help="Create/Update Jira defects automatically on test failures",
-    )
-    # Local Appium execution arguments
-    parser.addoption(
-        "--platform",
-        action="store",
-        default="android",
-        choices=["android", "ios"],
-        help="Platform to run tests on locally (android or ios)",
-    )
-    parser.addoption(
-        "--app-path",
-        action="store",
-        default="",
-        help="Absolute path to the local .apk or .ipa file for Appium",
-    )
-    parser.addoption(
-        "--device-name",
-        action="store",
-        default="",
-        help="Specific local device or emulator name (e.g. emulator-5554 or 'iPhone 15 Simulator')",
-    )
+from config.mobile_capabilities import get_local_caps
 
 
 @pytest.fixture(scope="function")

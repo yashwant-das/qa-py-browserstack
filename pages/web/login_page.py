@@ -1,4 +1,4 @@
-from pages.base_page import BasePage
+from pages.web.base_page import BasePage
 
 
 class LoginPage(BasePage):
@@ -21,7 +21,7 @@ class LoginPage(BasePage):
         self.click(self.LOGIN_BUTTON)
 
     def is_logged_in(self) -> bool:
-        return self.is_visible(self.INVENTORY_CONTAINER)
+        return self.wait_until_visible(self.INVENTORY_CONTAINER)
 
     def get_error_message(self) -> str:
         return self.get_text(self.ERROR_MESSAGE)

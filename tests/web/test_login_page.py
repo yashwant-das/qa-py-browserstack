@@ -1,7 +1,7 @@
 from playwright.sync_api import expect
 from pytest_testrail.plugin import pytestrail
 
-from pages.login_page import LoginPage
+from pages.web.login_page import LoginPage
 
 
 @pytestrail.case("46")

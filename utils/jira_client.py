@@ -20,7 +20,11 @@ class JiraClient:
                 "WARNING: Jira credentials not fully configured in .env. Defect creation disabled."
             )
         else:
-            self.jira = JIRA(server=self.url, basic_auth=(self.email, self.api_token))
+            try:
+                self.jira = JIRA(server=self.url, basic_auth=(self.email, self.api_token))
+            except Exception as e:
+                self.jira = None
+                print(f"[JIRA WARNING] Could not connect to Jira, defect creation disabled: {e}")
 
     def create_or_update_defect(
         self, test_name: str, error_message: str, traceback: str

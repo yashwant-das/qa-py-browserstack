@@ -1,12 +1,14 @@
 [project]
-name = "web-browserstack-framework"
+name = "qa-py-browserstack"
 version = "0.1.0"
-description = "Cross-browser test automation framework using Pytest, Playwright, and BrowserStack, with TestRail and Jira integrations."
+description = "Web, API and mobile tests on BrowserStack with Playwright, Appium and pytest, reporting to TestRail and Jira"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "appium-python-client>=5.2.6",
     "browserstack-sdk>=1.37.0",
     "jira>=3.10.5",
+    "pytest>=9.0.2",
     "pytest-html>=4.2.0",
     "pytest-playwright>=0.7.2",
     "pytest-testrail>=3.1.1",

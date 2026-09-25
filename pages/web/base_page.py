@@ -1,4 +1,5 @@
 from playwright.sync_api import Page
+from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 
 
 class BasePage:
@@ -22,6 +23,13 @@ class BasePage:
 
     def is_visible(self, selector: str) -> bool:
         return self.page.locator(selector).is_visible()
+
+    def wait_until_visible(self, selector: str, timeout: float = 10000) -> bool:
+        try:
+            self.page.locator(selector).wait_for(state="visible", timeout=timeout)
+            return True
+        except PlaywrightTimeoutError:
+            return False
 
     def get_title(self) -> str:
         return self.page.title()

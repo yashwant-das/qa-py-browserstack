@@ -1,6 +1,6 @@
 from pytest_testrail.plugin import pytestrail
 
-from pages.login_page import LoginPage
+from pages.mobile.login_page import LoginPage
 
 
 class TestDemoApp:

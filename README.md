@@ -1,150 +1,102 @@
-# Playwright + Pytest + BrowserStack POC Framework
+# qa-py-browserstack
 
-![Python](https://img.shields.io/badge/Python-3.12+-blue.svg?logo=python&logoColor=white) ![Playwright](https://img.shields.io/badge/Playwright-Enabled-2EAD33?logo=playwright&logoColor=white) ![pytest](https://img.shields.io/badge/pytest-Testing-0A9EDC?logo=pytest&logoColor=white) ![uv](https://img.shields.io/badge/uv-Fast_Deps-DE5FE9) ![BrowserStack](https://img.shields.io/badge/BrowserStack-Cloud-FF6600?logo=browserstack&logoColor=white) ![TestRail](https://img.shields.io/badge/TestRail-Integration-1F67AA) ![Jira](https://img.shields.io/badge/Jira-Defects-0052CC?logo=jira&logoColor=white)
+Web, API and mobile tests in one pytest project, run on BrowserStack real browsers and devices, with optional TestRail and Jira reporting. Proof of concept.
 
-This is a Proof-of-Concept (POC) cross-browser test automation framework built with Python, Pytest, Playwright, and integrated with BrowserStack for cloud execution.
+| Suite | Tool | Target | Runs on |
+|---|---|---|---|
+| `tests/web` | Playwright | [SauceDemo](https://www.saucedemo.com) | Local Chromium or BrowserStack Automate |
+| `tests/api` | Requests | [JSONPlaceholder](https://jsonplaceholder.typicode.com) | Locally |
+| `tests/mobile` | Appium | [WebdriverIO native demo app](https://github.com/webdriverio/native-demo-app) | Local emulator or BrowserStack App Automate |
 
-## Features
+This repo combines the former `qa-py-playwright-browserstack` and `qa-py-appium-browserstack`, with both histories kept.
 
-- **Page Object Model (POM):** Setup for web UI tests (`pages/base_page.py`, `pages/login_page.py`).
-- **Playwright Setup:** Native `pytest-playwright` integration for UI interaction.
-- **API Testing:** Utility to test APIs (`utils/api_client.py`). Tested using `jsonplaceholder.typicode.com`.
-- **BrowserStack Integration:** Ready-to-use cross-browser scaling with `browserstack-sdk`.
-
-## Project Structure
+## Structure
 
 ```text
-├── browserstack.yml     # BrowserStack execution configuration
+├── browserstack/
+│   ├── web.yml            # Browsers for the web suite
+│   └── mobile.yml         # Devices and app for the mobile suite
+├── config/
+│   └── mobile_capabilities.py   # Local Appium capabilities
 ├── pages/
-│   ├── base_page.py     # Base framework wrapper for elements 
-│   └── login_page.py    # Example POM logic
-├── pyproject.toml       # Dependencies configuration
+│   ├── web/               # Playwright page objects
+│   └── mobile/            # Appium page objects (Android and iOS locators)
 ├── tests/
+│   ├── conftest.py        # Command-line options and the Jira failure hook
 │   ├── api/
-│   │   └── test_api.py          # Examples of REST API testing
-│   ├── web/
-│   │   └── test_login_page.py   # Web specs matching page objects
-│   └── conftest.py              # Pytest global fixtures
+│   ├── mobile/            # conftest.py builds the Appium driver
+│   └── web/
 └── utils/
-    └── api_client.py    # API Utility requests
+    ├── api_client.py
+    └── jira_client.py
 ```
 
-## Setup & Run Local Tests
+## Setup
 
-1.  **Install dependencies using UV:**
+Requires Python 3.12+ and [uv](https://docs.astral.sh/uv/).
 
-    ```bash
-    uv sync
-    ```
-    *Make sure you have python 3.12+ installed.*
+```bash
+uv sync
+uv run playwright install chromium
+```
 
-2.  **Install Playwright Browsers:**
+## Run locally
 
-    ```bash
-    uv run playwright install chromium
-    ```
+```bash
+uv run pytest tests/api
+uv run pytest tests/web            # add --headed to watch the browser
+```
 
-3.  **Run Local Web Tests:**
+The mobile suite needs an Appium server on `http://127.0.0.1:4723` and an emulator or simulator. Download the demo app from the [v2.0.0 release](https://github.com/webdriverio/native-demo-app/releases/tag/v2.0.0) into `apps/android/` or `apps/ios/`, then:
 
-    ```bash
-    uv run pytest tests/web/
-    ```
+```bash
+uv run pytest tests/mobile --platform android
+uv run pytest tests/mobile --platform ios
+uv run pytest tests/mobile --platform android --app-path apps/custom.apk --device-name emulator-5554
+```
 
-4.  **Run Local API Tests:**
+| Flag | Values | Default |
+|---|---|---|
+| `--platform` | `android`, `ios` | `android` |
+| `--app-path` | Path to an `.apk` or `.ipa` | from `config/mobile_capabilities.py` |
+| `--device-name` | Emulator or simulator name | from `config/mobile_capabilities.py` |
 
-    ```bash
-    uv run pytest tests/api/
-    ```
+`pytest.ini` turns the BrowserStack SDK plugin off for local runs, because it takes over driver setup. `browserstack-sdk pytest` turns it back on.
 
-5.  **Useful Pytest Flags:**
+## Run on BrowserStack
 
-    *   **UI Mode:** To see the browser while running web tests, pass the `--headed` flag: 
-        `uv run pytest tests/web/test_login_page.py --headed`
-    *   **HTML Report:** To generate an HTML test report, pass the `--html` flag: 
-        `uv run pytest tests/web/ --html=test-results/report.html`
+The SDK reads `browserstack.yml` from the project root. Copy the config for the suite you want, then run through the SDK:
 
-## Run Tests on BrowserStack
+```bash
+export BROWSERSTACK_USERNAME=...
+export BROWSERSTACK_ACCESS_KEY=...
 
-This framework integrates with the BrowserStack SDK for cloud execution. It targets multiple OS and Browser combination natively as specified in `browserstack.yml`.
+cp browserstack/web.yml browserstack.yml
+uv run browserstack-sdk pytest tests/web
 
-1.  **Set Environment Variables:**
-    Export your BrowserStack credentials.
+cp browserstack/mobile.yml browserstack.yml
+uv run browserstack-sdk pytest tests/mobile --platform android
+```
 
-    ```bash
-    export BROWSERSTACK_USERNAME="YOUR_USERNAME"
-    export BROWSERSTACK_ACCESS_KEY="YOUR_ACCESS_KEY"
-    ```
+The root `browserstack.yml` is git-ignored. For mobile, the SDK uploads the app from `apps/android/` on each run, because BrowserStack deletes uploaded apps after 30 days.
 
-2.  **Run the Tests using the SDK:**
+## Reporting
 
-    ```bash
-    uv run browserstack-sdk pytest tests/web/
-    ```
+Both integrations are off unless you pass their flag.
 
-You can view the test results directly in the BrowserStack Automate dashboard.
+**TestRail** (`--testrail`): copy `testrail.cfg.example` to `testrail.cfg` and fill it in. Tests are linked with `@pytestrail.case("<id>")`.
 
-## TestRail Integration
+**Jira** (`--jira`): copy `.env.example` to `.env` and fill it in. A failing test opens a bug, or comments on the open bug for that test instead of creating a duplicate. If Jira is unreachable, the run continues without it.
 
-This repository is integrated with TestRail via the `pytest-testrail` plugin.
+## CI
 
-1. **Configure Credentials:** Copy the included `testrail.cfg.example` to a new file named `testrail.cfg` (which is git-ignored for safety) and fill in your details:
-   ```ini
-   [API]
-   url = https://yourdomain.testrail.io/
-   email = your_email@example.com
-   password = your_api_key
-   
-   [TESTRUN]
-   project_id = 1
-   ```
-2. **Tag Tests:** Decorate your Pytest definitions with their TestRail ID:
-   ```python
-   from pytest_testrail.plugin import pytestrail
-   
-   @pytestrail.case("1234")
-   def test_successful_login(page):
-   ```
-3. **Execute & Push:** When you run tests with the testrail flag, the results automatically update in TestRail:
-   ```bash
-   uv run pytest tests/web/ --testrail
-   # Or via BrowserStack
-   uv run browserstack-sdk pytest tests/web/ --testrail
-   ```
+`.github/workflows/tests.yml` runs on every push and pull request:
 
-## Jira Integration
+1. **local**: lint, check that every suite collects, and run the API and web tests in local Chromium. Needs no secrets.
+2. **browserstack**: runs the web and mobile suites on BrowserStack. Skipped with a notice when the secrets are missing.
 
-This repository automatically generates Jira Bug tickets whenever an automated test fails.
-
-1. **Configure Credentials:** The architecture listens for your Jira credentials in a secure `.env` file at the root. Copy the included `.env.example` to a new file named `.env` (which is git-ignored) and populate it:
-   ```env
-   JIRA_URL=https://yourcompany.atlassian.net
-   JIRA_EMAIL=your_email@example.com
-   JIRA_API_TOKEN=your_jira_api_token
-   JIRA_PROJECT_KEY=SCRUM
-   JIRA_BOARD_ID=1
-   ```
-2. **Execution:** Pass the `--jira` flag when running tests:
-   ```bash
-   uv run pytest tests/web/ --jira
-   # Or combine both
-   uv run pytest tests/web/ --testrail --jira
-   ```
-   The Pytest `makereport` hook inside `tests/conftest.py` will intercept the run. If a test fails, it captures the `AssertionError` traceback and pushes it to Jira.
-3. **Deduplication:** To avoid spamming your Jira board, the `JiraClient` searches for existing open bugs matching the failed Test Name. If an open bug already exists, it simply adds a comment with the latest failure traceback instead of creating a duplicate ticket!
-
-## CI/CD Secret Management
-
-To keep your credentials secure while executing successfully in your GitHub Actions pipeline, the `.github/workflows/playwright-tests.yml` natively consumes **GitHub Secrets** and constructs your config files automatically on the fly during the pipeline run. 
-
-Add the following keys to your repository's: `Settings > Secrets and variables > Actions`:
-
-* `BROWSERSTACK_USERNAME` 
-* `BROWSERSTACK_ACCESS_KEY`
-* `JIRA_URL` 
-* `JIRA_EMAIL`
-* `JIRA_API_TOKEN`
-* `TESTRAIL_URL`  *(e.g., https://yourcompany.testrail.io/)*
-* `TESTRAIL_EMAIL`
-* `TESTRAIL_API_KEY`
-
-Because the pipeline writes `testrail.cfg` dynamically and passes Jira credentials directly into standard Environment Variables (`env:`), your `.env` and `testrail.cfg` files will safely remain untracked locally without breaking your CI!
+| Setting | Type | Purpose |
+|---|---|---|
+| `BROWSERSTACK_USERNAME`, `BROWSERSTACK_ACCESS_KEY` | Secret | Cloud runs |
+| `ENABLE_TESTRAIL` = `true` | Variable | Report to TestRail, using the `TESTRAIL_URL`, `TESTRAIL_EMAIL` and `TESTRAIL_API_KEY` secrets |
+| `ENABLE_JIRA` = `true` | Variable | File Jira bugs, using the `JIRA_URL`, `JIRA_EMAIL` and `JIRA_API_TOKEN` secrets, and optional `JIRA_PROJECT_KEY` and `JIRA_BOARD_ID` variables |

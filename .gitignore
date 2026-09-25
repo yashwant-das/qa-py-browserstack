@@ -50,3 +50,14 @@ playwright/.cache/
 log/
 logs/
 *.log
+
+# BrowserStack: copied from browserstack/ before each run
+/browserstack.yml
+browserstack.err
+browserstack-local.log
+
+# Mobile app binaries (downloaded, never committed)
+apps/**/*.apk
+apps/**/*.ipa
+apps/**/*.app
+apps/**/*.zip
