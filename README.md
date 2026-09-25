@@ -75,8 +75,12 @@ cp browserstack/web.yml browserstack.yml
 uv run browserstack-sdk pytest tests/web
 
 cp browserstack/mobile.yml browserstack.yml
-uv run browserstack-sdk pytest tests/mobile --platform android
+uv sync --no-group web
+uv run --no-sync browserstack-sdk pytest tests/mobile --platform android
+uv sync                 # restore the full environment afterwards
 ```
+
+The SDK decides which framework to hook into from the installed packages, and skips Appium when Playwright is installed. That's why the mobile cloud run needs an environment without the `web` group, and why `--no-sync` stops `uv run` from reinstalling it.
 
 The root `browserstack.yml` is git-ignored. For mobile, the SDK uploads the app from `apps/android/` on each run, because BrowserStack deletes uploaded apps after 30 days.
 

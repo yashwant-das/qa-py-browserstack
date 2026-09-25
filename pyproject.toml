@@ -5,15 +5,22 @@ description = "Web, API and mobile tests on BrowserStack with Playwright, Appium
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "appium-python-client>=5.2.6",
     "browserstack-sdk>=1.37.0",
     "jira>=3.10.5",
     "pytest>=9.0.2",
     "pytest-html>=4.2.0",
-    "pytest-playwright>=0.7.2",
     "pytest-testrail>=3.1.1",
     "pytest-xdist>=3.8.0",
     "python-dotenv>=1.2.1",
     "requests>=2.32.5",
     "ruff>=0.15.2",
 ]
+
+# The BrowserStack SDK picks the framework to patch from what is installed: with
+# Playwright present it skips Appium. Cloud runs install only their suite's group.
+[dependency-groups]
+web = ["pytest-playwright>=0.7.2"]
+mobile = ["appium-python-client>=5.2.6"]
+
+[tool.uv]
+default-groups = ["web", "mobile"]

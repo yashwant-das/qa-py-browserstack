@@ -57,9 +57,11 @@ jobs:
         if: steps.creds.outputs.enabled == 'true'
       - uses: astral-sh/setup-uv@v5
         if: steps.creds.outputs.enabled == 'true'
+      # Install only this suite's framework: the SDK skips Appium when Playwright is installed.
       - name: Install dependencies
         if: steps.creds.outputs.enabled == 'true'
-        run: uv sync
+        run: |
+          if [ "${{ matrix.suite }}" = "mobile" ]; then uv sync --no-group web; else uv sync --no-group mobile; fi
 
       - name: Download the demo app
         if: steps.creds.outputs.enabled == 'true' && matrix.suite == 'mobile'
@@ -92,4 +94,4 @@ jobs:
           if [ "$ENABLE_TESTRAIL" = "true" ]; then flags+=(--testrail); fi
           if [ "$ENABLE_JIRA" = "true" ]; then flags+=(--jira); fi
           if [ "$SUITE" = "mobile" ]; then flags+=(--platform android); fi
-          uv run browserstack-sdk pytest "tests/$SUITE/" "${flags[@]}"
+          uv run --no-sync browserstack-sdk pytest "tests/$SUITE/" "${flags[@]}"
