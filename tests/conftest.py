@@ -1,8 +1,18 @@
 import pytest
+from pluggy import HookCaller
 
 from utils.jira_client import JiraClient
 
 _jira_client = None
+
+
+@pytest.hookimpl(trylast=True)
+def pytest_sessionfinish(session):
+    # browserstack-sdk leaves plain functions on the hook relay, which crash pluggy's unregister()
+    hook = session.config.pluginmanager.hook
+    for name, value in list(vars(hook).items()):
+        if not isinstance(value, HookCaller):
+            delattr(hook, name)
 
 
 def _jira():
