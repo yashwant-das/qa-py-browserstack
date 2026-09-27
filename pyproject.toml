@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Web, API and mobile tests on BrowserStack with Playwright, Appium and pytest, reporting to TestRail and Jira"
 readme = "README.md"
 requires-python = ">=3.12"
+license = "MIT"
 dependencies = [
     "browserstack-sdk>=1.51.2",
     "jira>=3.10.5",

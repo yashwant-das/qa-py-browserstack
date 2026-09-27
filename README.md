@@ -104,3 +104,7 @@ Both integrations are off unless you pass their flag.
 | `BROWSERSTACK_USERNAME`, `BROWSERSTACK_ACCESS_KEY` | Secret | Cloud runs |
 | `ENABLE_TESTRAIL` = `true` | Variable | Report to TestRail, using the `TESTRAIL_URL`, `TESTRAIL_EMAIL` and `TESTRAIL_API_KEY` secrets |
 | `ENABLE_JIRA` = `true` | Variable | File Jira bugs, using the `JIRA_URL`, `JIRA_EMAIL` and `JIRA_API_TOKEN` secrets, and optional `JIRA_PROJECT_KEY` and `JIRA_BOARD_ID` variables |
+
+## License
+
+MIT. See [LICENSE](LICENSE).
